@@ -37,12 +37,15 @@ router.route('/update/:id').post((req, res) => {
     .then((poem) => {
       poem.title = req.body.title;
       poem.content = req.body.content;
-
+      poem.mediaBackground = req.body.mediaBackground;
       poem.save()
         .then(() => res.json('Poem updated!'))
         .catch(err => res.status(400).json('Error: ' + err));
     })
-    .catch(err => res.status(400).json("Error: " + err));
+    .catch(err => {
+      console.log(err)
+      res.status(400).json("Error: " + err)
+    });
 });
 
 /**
@@ -60,6 +63,11 @@ router.post( '/create', ( req, res ) => {
     content,
     date
   });
+
+  if (req.body.mediaBackground) {
+    newPoem.mediaBackground = req.body.mediaBackground
+  }
+
   newPoem.save()
     .then(() => res.json('Poem added!'))
     .catch(err => res.status(400).json("Error: " + err));

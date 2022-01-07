@@ -58,48 +58,50 @@ router.route('/').get((req, res) => {
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
-/* GET single poem */
+/* GET single tile */
 router.route('/:id').get((req, res) => {
   MediaTile.findById(req.params.id)
     .then(tile => res.json(tile))
     .catch(err => res.status(400).json("Error: " + err));
 });
 
-/* DELETE poem */
+/* DELETE tile */
 router.route('/:id').delete((req, res) => {
   MediaTile.findByIdAndDelete(req.params.id)
     .then(() => res.json("Poem deleted."))
     .catch(err => res.status(400).json("Error: " + err));
 });
 
-/* UPDATE post */
+/* UPDATE tile */
 router.route('/update/:id').post((req, res) => {
-  mediaUpload(req, res, ( error ) => {
-    if(error){
-      console.log( 'errors', error );
-      res.json( { error: error } );
-    } else {
-      // If File not found
-      if(req.file === undefined){
-        console.log( 'Error: No File Selected!' );
-        res.json( 'Error: No File Selected' );
+  if (req.file) {
+    console.log("FILE!")
+    mediaUpload(req, res, ( error ) => {
+      if (error) {
+        console.log( 'errors', error );
+        return res.json( { error: error } );
       } else {
-        // If Success
-        MediaTile.findById(req.params.id)
-          .then((mT) => {
-            mT.mediaName = req.file.key;
-            mT.mediaLocation = req.file.location;
-            mT.title = req.body.title;
-            mT.date = Date.parse(req.body.date);
-
-            mT.save()
-              .then(() => res.json('Media tile updated!'))
-              .catch(err => res.status(400).json('Error: ' + err));
-          })
-          .catch(err => res.status(400).json("Error: " + err));
+        // If File not found
+        if(req.file === undefined){
+          console.log( 'Error: No File Selected!' );
+          return res.json( 'Error: No File Selected' );
+        }
       }
-    }
-  });
+    })
+  }
+  MediaTile.findById(req.params.id)
+    .then((mT) => {
+      if (req.file) {
+        mT.mediaName = req.file.key;
+        mT.mediaLocation = req.file.location;
+      }
+      mT.title = req.body.title;
+
+      mT.save()
+        .then(() => res.json('Media tile updated!'))
+        .catch(err => res.status(400).json('Error: ' + err));
+    })
+    .catch(err => res.status(400).json("Error: " + err));
 });
 
 /**

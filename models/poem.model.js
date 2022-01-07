@@ -17,7 +17,11 @@ const poemSchema = new Schema({
     	type: String, 
     	required: true
     },
-
+    mediaBackground: {
+    	type: mongoose.Schema.Types.ObjectId,
+        ref: 'VideoTile',
+        required: false,
+    }
 }, {
 	timestamps: true,
 });
