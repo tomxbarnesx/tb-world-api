@@ -1,16 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const compression = require('compression');
 
 require("dotenv").config();
 
 const app = express();
 app.use(express.json());
+app.use(compression());
 app.use(cors());
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`The server has started on port: ${PORT}`));
+app.listen(PORT);
 
 mongoose.connect(
 	process.env.MONGO_URI,{
@@ -19,10 +21,10 @@ mongoose.connect(
 		useCreateIndex: true,
 	},(err) => {
 		if (err) throw err;
-		console.log("MongoDB connection established");
 	}
 );
 
 app.use("/users", require("./routes/users"));
 app.use("/media-tiles", require("./routes/mediaTiles"));
 app.use("/poems", require("./routes/poems"));
+app.use("/portfolio-links", require("./routes/portfolioLinks"));

@@ -4,7 +4,7 @@ const multerS3 = require( 'multer-s3' );
 const multer = require('multer');
 const path = require( 'path' );
 const url = require('url');
-let MediaTile = require('../models/mediaTile.model')
+let MediaTile = require('../models/mediaTile.model');
 
 const router = express.Router();
 
@@ -52,38 +52,35 @@ function checkFileType( file, cb ){
 }
 
 /* GET tiles listing. */
-router.route('/').get((req, res) => {
+router.get('/', async (req, res) => {
   MediaTile.find()
     .then(tiles => res.json(tiles))
     .catch(err => res.status(400).json('Error: ' + err));
 });
 
 /* GET single tile */
-router.route('/:id').get((req, res) => {
+router.get('/:id', async (req, res) => {
   MediaTile.findById(req.params.id)
     .then(tile => res.json(tile))
     .catch(err => res.status(400).json("Error: " + err));
 });
 
 /* DELETE tile */
-router.route('/:id').delete((req, res) => {
+router.delete('/:id', async (req, res) => {
   MediaTile.findByIdAndDelete(req.params.id)
     .then(() => res.json("Poem deleted."))
     .catch(err => res.status(400).json("Error: " + err));
 });
 
 /* UPDATE tile */
-router.route('/update/:id').post((req, res) => {
+router.post('/update/:id', async (req, res) => {
   if (req.file) {
-    console.log("FILE!")
     mediaUpload(req, res, ( error ) => {
       if (error) {
-        console.log( 'errors', error );
         return res.json( { error: error } );
       } else {
         // If File not found
         if(req.file === undefined){
-          console.log( 'Error: No File Selected!' );
           return res.json( 'Error: No File Selected' );
         }
       }
@@ -109,15 +106,13 @@ router.route('/update/:id').post((req, res) => {
  * @desc Upload post image
  * @access public
  */
-router.post( '/upload', ( req, res ) => {
+router.post( '/upload', async ( req, res ) => {
   mediaUpload(req, res, ( error ) => {
     if(error){
-      console.log( 'errors', error );
       res.json( { error: error } );
     } else {
       // If File not found
       if(req.file === undefined){
-        console.log( 'Error: No File Selected!' );
         res.json( 'Error: No File Selected' );
       } else {
         // If Success
